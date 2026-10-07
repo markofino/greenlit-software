@@ -65,3 +65,7 @@ In Settings → Environment Vars, configure RESEND_API_KEY and CONTACT_FROM as a
 ## Website asset packaging fix
 
 The server now imports website-assets.mjs, which contains all six HTML pages and both images. This avoids relying on public/ being copied by Wasmer’s deployment packager. The checked-in bundle is ready to deploy. Keep website-assets.mjs at the root alongside server.mjs. If you edit files in public/, run npm run build and commit the updated website-assets.mjs. Use npm run build as the host build command and npm start as the start command. Both /contact and /contact.html work, as do the other page aliases.
+
+## Clean URLs
+
+Navigation uses /, /about, /services, /contact, /privacy, and /terms. Old .html URLs permanently redirect (HTTP 308) to these clean paths, retaining query parameters. Home is served at / without index.html in the address bar. Your domain is unchanged; no www redirect is added. Keep SITE_URL set to the exact origin you use.

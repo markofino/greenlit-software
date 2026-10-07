@@ -21,6 +21,14 @@ export function createApp({ apiKey = process.env.RESEND_API_KEY, from = process.
     res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
     try {
       const url = new URL(req.url, 'http://localhost');
+      if (['GET', 'HEAD'].includes(req.method)) {
+        const pageRedirects = { '/index.html': '/', '/about.html': '/about', '/services.html': '/services', '/contact.html': '/contact', '/privacy.html': '/privacy', '/terms.html': '/terms' };
+        const cleanPath = pageRedirects[url.pathname] || (['/about/', '/services/', '/contact/', '/privacy/', '/terms/'].includes(url.pathname) ? url.pathname.slice(0, -1) : null);
+        if (cleanPath) {
+          res.writeHead(308, { Location: cleanPath + url.search });
+          return res.end();
+        }
+      }
       if (url.pathname === '/api/contact') {
         if (req.method !== 'POST') { res.setHeader('Allow', 'POST'); return json(res, 405, { error: 'Use POST to submit the form.' }); }
         const allowed = siteUrl ? new URL(siteUrl).origin : null;

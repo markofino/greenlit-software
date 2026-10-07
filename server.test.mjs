@@ -41,3 +41,11 @@ test('contact form uses backend and page scripts and fonts are allowed by CSP',a
  const {base}=await fixture(t); const r=await fetch(base+'/contact.html');const html=await r.text();const csp=r.headers.get('content-security-policy');
  assert.match(html,/fetch\('\/api\/contact'/);assert.doesNotMatch(html,/formsubmit\.co/);assert.match(csp,/sha256-/);assert.match(csp,/fonts\.googleapis\.com/);assert.match(csp,/fonts\.gstatic\.com/);assert.match(html,/maxlength="5000"/);
 });
+
+test('redirects filename URLs and links use clean paths',async t=>{
+ const {base}=await fixture(t);
+ for(const [path,target] of [['/index.html','/'],['/contact.html','/contact'],['/services.html?service=Website','/services?service=Website'],['/contact/','/contact']]){
+  const r=await fetch(base+path,{redirect:'manual'});assert.equal(r.status,308);assert.equal(r.headers.get('location'),target);
+ }
+ const html=await (await fetch(base+'/')).text();assert.doesNotMatch(html,/href="(?:index|about|services|contact|privacy|terms)\.html/);assert.match(html,/href="\/contact"/);
+});
